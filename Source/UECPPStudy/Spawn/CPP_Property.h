@@ -17,10 +17,10 @@ private:
 		int A = 10;
 
 	UPROPERTY(EditInstanceOnly)//level에 배치한 객체의 경우 에디터에서 수정가능
-		int B = 10;
+		int B = 20;
 
-	UPROPERTY(EditDefaultsOnly)//BPediter상에서만 수정가능 (level에 배치하면 안됨)
-		int C = 10;
+	UPROPERTY(EditDefaultsOnly)//BP Editer상에서만 수정가능 (level에 배치하면 안됨)
+		int C = 30;
 
 	UPROPERTY(VisibleAnywhere)//보이기만 할뿐 수정은 불가능
 		int D = 40;
@@ -28,7 +28,7 @@ private:
 protected:
 	//블루프린트에서 읽을수있고  level에 배치하면 사용가능  카테고리는  "Property" 이다
 	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "Property")
-		int Variable = 60;
+		int Variable = 50;
 
 public:	
 	ACPP_Property();
