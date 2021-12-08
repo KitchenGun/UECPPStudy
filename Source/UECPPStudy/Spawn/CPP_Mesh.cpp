@@ -9,6 +9,7 @@
 ACPP_Mesh::ACPP_Mesh()
 {
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
+	RootComponent = Mesh;
 	////비동기 로드
 	//ConstructorHelpers::FObjectFinder<UStaticMesh> mesh(L"StaticMesh'/Game/Mesh/SM_Cube.SM_Cube'");
 	////위에 넣은 주소가 유호한지 확인용
