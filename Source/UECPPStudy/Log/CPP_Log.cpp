@@ -3,6 +3,15 @@
 
 ACPP_Log::ACPP_Log()
 {
+	/*
+	UObject : U
+	AActor : A
+	SWidget : S
+	Interface : I
+	Enum : E
+	Bool : B
+	상속과 관련 없는 오브젝트와 구조체나 클래스 : F
+	*/
 }
 
 void ACPP_Log::BeginPlay()
