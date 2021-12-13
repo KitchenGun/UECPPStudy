@@ -1,4 +1,5 @@
 #include "Collision/CPP_Light.h"
+#include "CPP_Trigger.h"
 #include "Components/BoxComponent.h"
 #include "Components/TextRenderComponent.h"
 #include "Components/PointLightComponent.h"
@@ -35,7 +36,44 @@ ACPP_Light::ACPP_Light()
 void ACPP_Light::BeginPlay()
 {
 	Super::BeginPlay();
+	PointLight->SetVisibility(false);
+	PointLight2->SetVisibility(false);
+
+	TArray<AActor*> actors;//포인트 액터 배열
+	//월드에 배치된것 중에서 특정 클래스를 가지고 있는 객체들을 반환하는 함수
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACPP_Trigger::StaticClass(), actors);
+	ACPP_Trigger* trigger = nullptr;
+	if (actors[0])
+	{
+		trigger = Cast<ACPP_Trigger>(actors[0]);
+		trigger->OnBoxLightBeginOverlap.BindUFunction(this,"OnLight");//매개변수와 반환형식을 맞춰줘야한다
+		trigger->OnBoxLightEndOverlap.BindUFunction(this, "OffLight");
+		trigger->OnBoxLightColorOverlap.BindUFunction(this, "OnRandomLight");
+		/*
+		OnLight			:Point Light 가 보이도록 설정
+		OffLight		:안보이도록 설정
+		OnRandomLight	:Point Light2가 랜덤색을 가지도록 설정
+		*/
+	}
+}
+
+void ACPP_Light::OnLight()
+{
 	PointLight->SetVisibility(true);
+	PointLight2->SetVisibility(true);
+}
+
+void ACPP_Light::OffLight()
+{
+	PointLight->SetVisibility(false);
+	PointLight2->SetVisibility(false);
+}
+
+FString ACPP_Light::OnRandomLight(FLinearColor InColor)
+{
+	PointLight2->SetVisibility(true);
+	PointLight2->SetLightColor(InColor);
+	return InColor.ToString();
 }
 
 
