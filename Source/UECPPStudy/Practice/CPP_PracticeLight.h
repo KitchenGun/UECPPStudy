@@ -12,14 +12,16 @@ private:
 	UPROPERTY(VisibleDefaultsOnly)
 		class USceneComponent* Root;
 	UPROPERTY(VisibleDefaultsOnly)
-		class UPointLightComponent* PointLight[2];
+		class UTextRenderComponent* Text;
+	UPROPERTY(VisibleDefaultsOnly)
+		class USpotLightComponent* SpotLights[3];
 public:	
 	ACPP_PracticeLight();
 
 protected:
 	virtual void BeginPlay() override;
-protected:
+private:
 	UFUNCTION()
-		void ChangeColor(int index,FLinearColor color);
+		void OnLight (int index,FLinearColor color);
 
 };

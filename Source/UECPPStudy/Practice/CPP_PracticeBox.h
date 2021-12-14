@@ -9,11 +9,13 @@ class UECPPSTUDY_API ACPP_PracticeBox : public AActor
 {
 	GENERATED_BODY()
 private:
-	UPROPERTY()
-		class UMaterialInstanceDynamic* Material[2];
-protected:
-	UPROPERTY(EditAnyWhere)//아키타입에서 보여주기만 한다
-		class UStaticMeshComponent* Mesh[2];//전방선언
+	UPROPERTY(VisibleDefaultsOnly)
+		class USceneComponent* Root;
+	UPROPERTY(VisibleDefaultsOnly)
+		class UTextRenderComponent* Text;
+	UPROPERTY(VisibleDefaultsOnly)
+		class UStaticMeshComponent* Meshes[3];
+
 public:	
 	ACPP_PracticeBox();
 
@@ -22,5 +24,8 @@ protected:
 
 private:
 	UFUNCTION()
-		void ChangeColor(int32 index,FLinearColor color);
+		void OnPhysics(int32 index, FLinearColor InColor);
+private:
+	class UMaterialInstanceDynamic* Materials[3];
+	FVector WorldLocations[3];
 };

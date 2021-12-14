@@ -1,37 +1,53 @@
 #include "Practice/CPP_PracticeLight.h"
 #include "../Collision/CPP_MultiTrigger.h"
-#include "../Utilities/CHelpers.h"
-#include "Components/PointLightComponent.h"
+#include "../../UECPPStudy/Utilities/CLog.h"
+#include "../../UECPPStudy/Utilities/CHelpers.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Components/SpotLightComponent.h"
+#include "Components/TextRenderComponent.h"
 
 ACPP_PracticeLight::ACPP_PracticeLight()
 {
 
 	CHelpers::CreateComponent<USceneComponent>(this, &Root, "Root");
-	CHelpers::CreateComponent<UPointLightComponent>(this, &PointLight[0], "PointLight0", Root);
-	CHelpers::CreateComponent<UPointLightComponent>(this, &PointLight[1], "PointLight1", Root);
-	CHelpers::CreateComponent<UPointLightComponent>(this, &PointLight[2], "PointLight2", Root);
-
-	PointLight[0]->SetRelativeLocation(FVector(120 * 0, 0, 0));
-	PointLight[1]->SetRelativeLocation(FVector(120 * 1, 0, 0));
-	PointLight[2]->SetRelativeLocation(FVector(120 * 2, 0, 0));
+	CHelpers::CreateComponent<UTextRenderComponent>(this, &Text, "Text");
+	
+	Text->SetRelativeLocation(FVector(0, 0, 100));
+	Text->SetRelativeRotation(FRotator(0, 180, 0));
+	Text->SetRelativeScale3D(FVector(2));
+	Text->TextRenderColor = FColor::Red;
+	Text->Text = FText::FromString(GetName().Replace(L"Defalut_", L""));
+	Text->HorizontalAlignment = EHorizTextAligment::EHTA_Center;
+	
+	for (int32 i = 0; i < 3; i++)
+	{
+		FString str;
+		str.Append("SportLights");
+		str.Append(FString::FromInt(i + 1));
+		CHelpers::CreateComponent<USpotLightComponent>(this, &SpotLights[i], FName(str), Root);
+		SpotLights[i]->SetRelativeLocation(FVector(0,i*150,0));
+		SpotLights[i]->SetRelativeRotation(FRotator(-90, 0, 0));
+		SpotLights[i]->Intensity = 1e+5f;
+		SpotLights[i]->OuterConeAngle = 25;
+	}
 }
 
 void ACPP_PracticeLight::BeginPlay()
 {
 	Super::BeginPlay();
-	TArray<AActor*> actors;//포인트 액터 배열
-	//월드에 배치된것 중에서 특정 클래스를 가지고 있는 객체들을 반환하는 함수
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACPP_MultiTrigger::StaticClass(), actors);
-	ACPP_MultiTrigger* trigger = nullptr;
-	if (actors[0])
-	{
-		trigger = Cast<ACPP_MultiTrigger>(actors[0]);
-		trigger->OnMultiLightBeginOverlap.AddUFunction(this, "ChangeColor");
-	}
+	ACPP_MultiTrigger* trigger = CHelpers::FindActor<ACPP_MultiTrigger>(GetWorld());
+	if (trigger)
+		trigger->OnMultiLightBeginOverlap.AddUFunction(this, "OnLight");
+
 }
 
-void ACPP_PracticeLight::ChangeColor(int index, FLinearColor color)
+void ACPP_PracticeLight::OnLight(int index, FLinearColor color)
 {
-	PointLight[index]->SetLightColor(color);
+	for (int32 i = 0; i < 3; i++)
+	{
+		SpotLights[i]->SetLightColor(FLinearColor(1, 1, 1));
+	}
+	SpotLights[index]->SetLightColor(color);
 }
+
 

@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Components/SceneComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 
 class UECPPSTUDY_API CHelpers
 {
@@ -31,5 +32,37 @@ public:
 		}
 
 		InActor->SetRootComponent(*OutComponent);
+	}
+
+	template<typename T>
+	static T* FindActor(UWorld* InWorld, int32 InIndex = 0)
+	{
+		TArray<AActor*> actors;
+		UGameplayStatics::GetAllActorsOfClass(InWorld, T::StaticClass(), actors);
+
+		if (actors.Num() < 1)
+			return nullptr;
+		return Cast<T>(actors[InIndex]);
+	}
+	template<typename T>
+	static void FindActors(UWorld* InWorld, TArray<T*>& OutActors)
+	{
+		TArray<AActor*> actors;
+		UGameplayStatics::GetAllActorsOfClass(InWorld, T::StaticClass(), actors);
+
+		for (AActor* actor : actors)
+		{
+			T* obj = Cast<T>(actor);
+			if (obj)OutActors.Add(obj);
+		}
+	}
+	static FLinearColor GetRandomColor()
+	{
+		FLinearColor color;
+		color.R = UKismetMathLibrary::RandomFloatInRange(0, 1);
+		color.G = UKismetMathLibrary::RandomFloatInRange(0, 1);
+		color.B = UKismetMathLibrary::RandomFloatInRange(0, 1);
+		color.A = 1.0f;
+		return color;
 	}
 };
