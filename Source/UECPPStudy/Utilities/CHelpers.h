@@ -8,6 +8,14 @@
 class UECPPSTUDY_API CHelpers
 {
 public:	
+	//클래스 불러오는 템플릿함수 제작필요CHelpers::GetClass(&DefaultPawnClass, L"Blueprint'/Game/Player/BP_Player.BP_Player_C'")
+	template<typename T>
+	static TSubclassOf<APawn> GetClass(const TCHAR* InPath)
+	{
+		ConstructorHelpers::FClassFinder<T> asset(InPath);
+		return asset.Class;
+	}
+
 	template<typename T>
 	static void GetAsset(T** OutObject, FString InPath)
 	{
@@ -21,7 +29,6 @@ public:
 		*OutObject = Cast<T>(StaticLoadObject(T::StaticClass(), NULL, *InPath));
 	}
 
-	//클래스 불러오는 템플릿함수 제작필요
 	template<typename T>
 	static void CreateComponent(AActor* InActor,T**OutComponent,FName InName,USceneComponent* InParent = nullptr)
 	{

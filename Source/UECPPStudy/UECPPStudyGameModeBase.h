@@ -11,7 +11,8 @@ UCLASS()
 class UECPPSTUDY_API AUECPPStudyGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
-	
+private:
+	TSubclassOf<APawn> player;
 public:
 	AUECPPStudyGameModeBase();
 };

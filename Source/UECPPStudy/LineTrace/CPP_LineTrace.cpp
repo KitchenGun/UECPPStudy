@@ -24,11 +24,11 @@ void ACPP_LineTrace::BeginPlay()
 	
 	FVector start = GetActorLocation();
 
-	UKismetSystemLibrary::LineTraceSingleByProfile
-	(
-		GetWorld(),
-
-		);
+	//UKismetSystemLibrary::LineTraceSingleByProfile
+	//(
+	//	GetWorld(),
+	//
+	//	);
 }
 
 void ACPP_LineTrace::Tick(float DeltaTime)

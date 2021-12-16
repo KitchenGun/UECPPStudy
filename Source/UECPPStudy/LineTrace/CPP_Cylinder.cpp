@@ -6,7 +6,7 @@
 ACPP_Cylinder::ACPP_Cylinder()
 {
 	CHelpers::CreateComponent<USceneComponent>(this, &Root, "Root");
-	CHelpers::CreateComponent<UStaticComponent>(this, &Mesh, "Mesh", Root);
+	CHelpers::CreateComponent<UStaticMeshComponent>(this, &Mesh, "Mesh", Root);
 	CHelpers::CreateComponent<UTextRenderComponent>(this, &Text, "Text", Root);
 
 	UStaticMesh* mesh;
