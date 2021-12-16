@@ -21,6 +21,7 @@ public:
 		*OutObject = Cast<T>(StaticLoadObject(T::StaticClass(), NULL, *InPath));
 	}
 
+	//클래스 불러오는 템플릿함수 제작필요
 	template<typename T>
 	static void CreateComponent(AActor* InActor,T**OutComponent,FName InName,USceneComponent* InParent = nullptr)
 	{
@@ -65,4 +66,5 @@ public:
 		color.A = 1.0f;
 		return color;
 	}
+
 };

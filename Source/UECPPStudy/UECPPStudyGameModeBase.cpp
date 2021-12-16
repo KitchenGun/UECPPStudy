@@ -1,5 +1,12 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
-
 #include "UECPPStudyGameModeBase.h"
+#include "CPP_Player.h"
 
+AUECPPStudyGameModeBase::AUECPPStudyGameModeBase()
+{
+	ConstructorHelpers::FClassFinder<ACPP_Player> player(L"Blueprint'/Game/BP/Player/BP_Player.BP_Player_C'");//class는_C붙여야함
+	
+	if (player.Succeeded())
+	{
+		DefaultPawnClass = player.Class;
+	}
+}
