@@ -1,10 +1,10 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "CPP_LineTrace.generated.h"
+//이벤트 대리자(현재와 다른거임) : 클래스 내부에 선언해서 해당 클래스에서만 사용이 가능한것을 이벤트 델리게이트라고 함
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FLineTraceResult, class AActor*, InActor, FLinearColor, InColor);
 
 UCLASS()
 class UECPPSTUDY_API ACPP_LineTrace : public AActor
@@ -16,15 +16,19 @@ private:
 	UPROPERTY(VisibleDefaultsOnly)
 		class UTextRenderComponent* Text;
 public:	
-	// Sets default values for this actor's properties
 	ACPP_LineTrace();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
+private:
+	UFUNCTION()
+		void StartJump(class AActor* InActor, FLinearColor InColor);
+private:
+	UPROPERTY(BlueprintAssignable)//블루프린트에서 사용하기 위해서 사용 멀티케스트 대리자만 사용가능
+	FLineTraceResult OnLineTraceResult;
+private:
+	TArray<class ACPP_Cylinder*> Cylinders;
 };
