@@ -25,6 +25,10 @@ ACPP_Player::ACPP_Player()
 	GetMesh()->SetRelativeLocation(FVector(0, 0, -90));
 	GetMesh()->SetRelativeRotation(FRotator(0, -90, 0));
 
+	TSubclassOf<UAnimInstance> animInstance;
+	CHelpers::GetClass<UAnimInstance>(&animInstance, "AnimBlueprint'/Game/BP/Player/ABP_Player.ABP_Player_C'");
+	GetMesh()->SetAnimInstanceClass(animInstance);
+
 	SpringArm->SetRelativeLocation(FVector(0, 0, 60));
 	SpringArm->TargetArmLength = 200;
 	SpringArm->bUsePawnControlRotation = true;
@@ -49,6 +53,12 @@ void ACPP_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	PlayerInputComponent->BindAxis("MoveForward",this,&ACPP_Player::OnMoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ACPP_Player::OnMoveRight);
+	PlayerInputComponent->BindAxis("HorizontalLook", this, &ACPP_Player::OnHorizontalLook);
+	PlayerInputComponent->BindAxis("VerticalLook", this, &ACPP_Player::OnVerticalLook);
+	PlayerInputComponent->BindAxis("Zoom", this, &ACPP_Player::OnZoom);
+
+	PlayerInputComponent->BindAction("Run", EInputEvent::IE_Pressed, this, &ACPP_Player::OnRun);
+	PlayerInputComponent->BindAction("Run", EInputEvent::IE_Released, this, &ACPP_Player::OffRun);
 }
 
 void ACPP_Player::OnMoveForward(float AxisValue)
@@ -65,5 +75,31 @@ void ACPP_Player::OnMoveRight(float AxisValue)
 	FVector direction = FQuat(rotator).GetRightVector().GetSafeNormal();//.Normalize/반환값이 bool 이라서 사용하지 않음
 
 	AddMovementInput(direction, AxisValue);
+}
+
+void ACPP_Player::OnHorizontalLook(float AxisValue)
+{
+	AddControllerYawInput(AxisValue);
+}
+
+void ACPP_Player::OnVerticalLook(float AxisValue)
+{
+	AddControllerPitchInput(AxisValue);
+}
+
+void ACPP_Player::OnZoom(float AxisValue)
+{
+	SpringArm->TargetArmLength += (ZoomSpeed * AxisValue * GetWorld()->GetDeltaSeconds());
+	SpringArm->TargetArmLength = FMath::Clamp(SpringArm->TargetArmLength, ZoomRange.X, ZoomRange.Y);
+}
+
+void ACPP_Player::OnRun()
+{
+	GetCharacterMovement()->MaxWalkSpeed = 600;
+}
+
+void ACPP_Player::OffRun()
+{
+	GetCharacterMovement()->MaxWalkSpeed = 400;
 }
 
