@@ -2,10 +2,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "TPS/IRifle.h"
 #include "CPP_Player.generated.h"
 
+
 UCLASS()
-class UECPPSTUDY_API ACPP_Player : public ACharacter
+class UECPPSTUDY_API ACPP_Player : public ACharacter,public IIRifle
 {
 	GENERATED_BODY()
 private:
@@ -13,6 +15,9 @@ private:
 		class USpringArmComponent* SpringArm;
 	UPROPERTY(VisibleDefaultsOnly)
 		class UCameraComponent* Camera;
+
+	class ACPP_Rifle* Rifle;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Zoom")
 		float ZoomSpeed = 1000;
 	UPROPERTY(EditDefaultsOnly, Category = "Zoom")
@@ -38,4 +43,13 @@ private:
 	void OnRun();
 	void OffRun();
 
+
+	void OnRifle_Equip();
+
+	// IIRifle을(를) 통해 상속됨
+	virtual void Begin_Equip_Rifle() override;
+	virtual void End_Equip_Rifle() override;
+	virtual void Begin_UnEquip_Rifle() override;
+	virtual void End_UnEquip_Rifle() override;
+	virtual bool Get_Equip_Rifle() override;
 };

@@ -32,7 +32,7 @@ public:
 
 
 public:
-	ACPP_Rifle* Spawn(class UWorld* InWorld, class ACharacter* InOwnerCharacter);
+	static ACPP_Rifle* Spawn(class UWorld* InWorld, class ACharacter* InOwnerCharacter);
 public:
 	void Equip();
 	void Begin_Equip();
@@ -41,6 +41,10 @@ public:
 	void UnEquip();
 	void Begin_UnEquip();
 	void End_UnEquip();
+
+public:
+	FORCEINLINE bool GetEquipped() { return bEquipped; }
+
 private:
 	class ACharacter* OwnerCharacter;
 

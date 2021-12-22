@@ -8,7 +8,7 @@
 #include "Components/ArrowComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Materials/MaterialInstanceDynamic.h"
-
+#include "TPS/CPP_Rifle.h"
 
 ACPP_Player::ACPP_Player()
 {
@@ -39,7 +39,7 @@ ACPP_Player::ACPP_Player()
 void ACPP_Player::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	Rifle = ACPP_Rifle::Spawn(GetWorld(), this);
 }
 
 void ACPP_Player::Tick(float DeltaTime)
@@ -59,6 +59,8 @@ void ACPP_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 	PlayerInputComponent->BindAction("Run", EInputEvent::IE_Pressed, this, &ACPP_Player::OnRun);
 	PlayerInputComponent->BindAction("Run", EInputEvent::IE_Released, this, &ACPP_Player::OffRun);
+
+	PlayerInputComponent->BindAction("Rifle", EInputEvent::IE_Pressed, this, &ACPP_Player::OnRifle_Equip);
 }
 
 void ACPP_Player::OnMoveForward(float AxisValue)
@@ -102,4 +104,35 @@ void ACPP_Player::OffRun()
 {
 	GetCharacterMovement()->MaxWalkSpeed = 400;
 }
+
+void ACPP_Player::OnRifle_Equip()
+{
+	Rifle->Equip();
+}
+
+void ACPP_Player::Begin_Equip_Rifle()
+{
+	Rifle->Begin_Equip();
+}
+
+void ACPP_Player::End_Equip_Rifle()
+{
+	Rifle->End_Equip();
+}
+
+void ACPP_Player::Begin_UnEquip_Rifle()
+{
+	Rifle->Begin_UnEquip();
+}
+
+void ACPP_Player::End_UnEquip_Rifle()
+{
+	Rifle->End_UnEquip();
+}
+
+bool ACPP_Player::Get_Equip_Rifle()
+{
+	return Rifle->GetEquipped();
+}
+
 
