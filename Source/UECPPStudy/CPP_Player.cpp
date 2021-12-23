@@ -51,16 +51,19 @@ void ACPP_Player::Tick(float DeltaTime)
 void ACPP_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	PlayerInputComponent->BindAxis("MoveForward",this,&ACPP_Player::OnMoveForward);
-	PlayerInputComponent->BindAxis("MoveRight", this, &ACPP_Player::OnMoveRight);
-	PlayerInputComponent->BindAxis("HorizontalLook", this, &ACPP_Player::OnHorizontalLook);
-	PlayerInputComponent->BindAxis("VerticalLook", this, &ACPP_Player::OnVerticalLook);
-	PlayerInputComponent->BindAxis("Zoom", this, &ACPP_Player::OnZoom);
+	PlayerInputComponent->BindAxis("MoveForward"	, this,&ACPP_Player::OnMoveForward);
+	PlayerInputComponent->BindAxis("MoveRight"		, this, &ACPP_Player::OnMoveRight);
+	PlayerInputComponent->BindAxis("HorizontalLook"	, this, &ACPP_Player::OnHorizontalLook);
+	PlayerInputComponent->BindAxis("VerticalLook"	, this, &ACPP_Player::OnVerticalLook);
+	PlayerInputComponent->BindAxis("Zoom"			, this, &ACPP_Player::OnZoom);
 
 	PlayerInputComponent->BindAction("Run", EInputEvent::IE_Pressed, this, &ACPP_Player::OnRun);
 	PlayerInputComponent->BindAction("Run", EInputEvent::IE_Released, this, &ACPP_Player::OffRun);
 
 	PlayerInputComponent->BindAction("Rifle", EInputEvent::IE_Pressed, this, &ACPP_Player::OnRifle_Equip);
+
+	PlayerInputComponent->BindAction("Aim", EInputEvent::IE_Pressed, this, &ACPP_Player::OnAim);
+	PlayerInputComponent->BindAction("Aim", EInputEvent::IE_Released, this, &ACPP_Player::OffAim);
 }
 
 void ACPP_Player::OnMoveForward(float AxisValue)
@@ -110,6 +113,16 @@ void ACPP_Player::OnRifle_Equip()
 	Rifle->Equip();
 }
 
+void ACPP_Player::OnAim()
+{
+	Rifle->Begin_Aim();
+}
+
+void ACPP_Player::OffAim()
+{
+	Rifle->End_Aim();
+}
+
 void ACPP_Player::Begin_Equip_Rifle()
 {
 	Rifle->Begin_Equip();
@@ -133,6 +146,11 @@ void ACPP_Player::End_UnEquip_Rifle()
 bool ACPP_Player::Get_Equip_Rifle()
 {
 	return Rifle->GetEquipped();
+}
+
+bool ACPP_Player::Get_Aim_Rifle()
+{
+	return Rifle->GetAiming();
 }
 
 

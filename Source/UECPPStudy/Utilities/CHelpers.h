@@ -49,6 +49,12 @@ public:
 	}
 
 	template<typename T>
+	static T* GetComponent(AActor* InActor)
+	{
+		return Cast<T>(InActor->GetComponentByClass(T::StaticClass()));
+	}
+
+	template<typename T>
 	static T* FindActor(UWorld* InWorld, int32 InIndex = 0)
 	{
 		TArray<AActor*> actors;

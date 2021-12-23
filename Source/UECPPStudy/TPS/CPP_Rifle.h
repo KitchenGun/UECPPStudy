@@ -2,7 +2,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Components/TimelineComponent.h"
 #include "CPP_Rifle.generated.h"
+
 
 UCLASS()
 class UECPPSTUDY_API ACPP_Rifle : public AActor
@@ -17,7 +19,8 @@ private:
 		class UAnimMontage* GrabMontage;
 	UPROPERTY(EditDefaultsOnly, Category = "Montage")
 		class UAnimMontage* UnGrabMontage;
-
+	UPROPERTY(EditDefaultsOnly, Category = "Aim")
+		class UCurveFloat* Curve;
 private:
 	UPROPERTY(VisibleDefaultsOnly)
 		class USkeletalMeshComponent* Mesh;
@@ -33,7 +36,12 @@ public:
 
 public:
 	static ACPP_Rifle* Spawn(class UWorld* InWorld, class ACharacter* InOwnerCharacter);
+private:
+	void Firing();
 public:
+	UFUNCTION()
+		void Aiming(float Output);
+
 	void Equip();
 	void Begin_Equip();
 	void End_Equip();
@@ -42,12 +50,25 @@ public:
 	void Begin_UnEquip();
 	void End_UnEquip();
 
+	void Begin_Aim();
+	void End_Aim();
+
+	void Begin_Fire();
+	void End_Fire();
+private:
+	bool IsAvailableAim();
+
 public:
 	FORCEINLINE bool GetEquipped() { return bEquipped; }
-
+	FORCEINLINE bool GetAiming() { return bAiming; }
 private:
 	class ACharacter* OwnerCharacter;
 
 	bool bEquipped;
 	bool bEquipping;
+	bool bAiming;
+	bool bFiring;
+
+	FTimeline Timeline;
+	FOnTimelineFloat OnTimelineFloat;
 };

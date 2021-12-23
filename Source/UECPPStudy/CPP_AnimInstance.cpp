@@ -26,6 +26,7 @@ void UCPP_AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if (rifle != nullptr)
 	{
 		bEquipped = rifle->Get_Equip_Rifle();
+		bAiming = rifle->Get_Aim_Rifle();
 	}
 
 }

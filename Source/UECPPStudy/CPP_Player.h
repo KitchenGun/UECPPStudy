@@ -43,8 +43,10 @@ private:
 	void OnRun();
 	void OffRun();
 
-
 	void OnRifle_Equip();
+
+	void OnAim();
+	void OffAim();
 
 	// IIRifle을(를) 통해 상속됨
 	virtual void Begin_Equip_Rifle() override;
@@ -52,4 +54,5 @@ private:
 	virtual void Begin_UnEquip_Rifle() override;
 	virtual void End_UnEquip_Rifle() override;
 	virtual bool Get_Equip_Rifle() override;
+	virtual bool Get_Aim_Rifle() override;
 };
