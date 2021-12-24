@@ -21,6 +21,24 @@ private:
 		class UAnimMontage* UnGrabMontage;
 	UPROPERTY(EditDefaultsOnly, Category = "Aim")
 		class UCurveFloat* Curve;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Fire")
+		float AimDistance =3000;
+	UPROPERTY(EditDefaultsOnly, Category = "Fire")
+		TSubclassOf<class UMatineeCameraShake> CameraShakeClass;
+	UPROPERTY(EditDefaultsOnly, Category = "Fire")
+		class USoundCue* MuzzleSoundCue;
+	UPROPERTY(EditDefaultsOnly, Category = "Fire")
+		class UParticleSystem* FlashParticle;
+	UPROPERTY(EditDefaultsOnly, Category = "Fire")
+		class UParticleSystem* EjectParticle;
+	UPROPERTY(EditDefaultsOnly, Category = "Fire")
+		TSubclassOf<class ACPP_Bullet> BulletClass;
+	UPROPERTY(EditDefaultsOnly, Category = "Fire")
+		class UParticleSystem* ImpactParticle;
+	UPROPERTY(EditDefaultsOnly, Category = "Fire")
+		class UMaterialInstanceConstant* ImpactDecal;
+
 private:
 	UPROPERTY(VisibleDefaultsOnly)
 		class USkeletalMeshComponent* Mesh;
