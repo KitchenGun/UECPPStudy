@@ -66,7 +66,9 @@ void ACPP_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction("Aim", EInputEvent::IE_Released, this, &ACPP_Player::OffAim);
 
 	PlayerInputComponent->BindAction("Fire", EInputEvent::IE_Pressed, this, &ACPP_Player::OnFire);
-	PlayerInputComponent->BindAction("Fire", EInputEvent::IE_Pressed, this, &ACPP_Player::OffFire);
+	PlayerInputComponent->BindAction("Fire", EInputEvent::IE_Released, this, &ACPP_Player::OffFire);
+
+	PlayerInputComponent->BindAction("AutoFire", EInputEvent::IE_Pressed, this, &ACPP_Player::OnAutoFire);
 }
 
 void ACPP_Player::OnMoveForward(float AxisValue)
@@ -134,6 +136,11 @@ void ACPP_Player::OnFire()
 void ACPP_Player::OffFire()
 {
 	Rifle->End_Fire();
+}
+
+void ACPP_Player::OnAutoFire()
+{
+	Rifle->ToggleAutoFire();
 }
 
 void ACPP_Player::Begin_Equip_Rifle()

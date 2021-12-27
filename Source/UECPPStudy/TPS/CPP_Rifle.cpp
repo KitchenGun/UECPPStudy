@@ -108,6 +108,13 @@ void ACPP_Rifle::Firing()
 			bullet->Shot(direction);
 		}
 	}
+
+	//반동
+	{
+		PitchAngle -= 0.25 * GetWorld()->DeltaTimeSeconds;
+		OwnerCharacter->AddControllerPitchInput(PitchAngle);
+	}
+
 	//linetrace
 	TArray<AActor*> ignoreActors;//자기 자신충돌 제외하기 위해서
 	ignoreActors.Add(OwnerCharacter);
@@ -122,7 +129,9 @@ void ACPP_Rifle::Firing()
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticle, hitResult.Location, rotator);
 		//피격 지점 표시
 		UDecalComponent* decal = UGameplayStatics::SpawnDecalAtLocation(GetWorld(), ImpactDecal, FVector(5), hitResult.Location, rotator, 10);
+		decal->SetFadeScreenSize(0);//
 	}
+
 }
 
 void ACPP_Rifle::Aiming(float Output)
@@ -214,12 +223,28 @@ void ACPP_Rifle::Begin_Fire()
 	if (!bAiming)	return;
 	if (bFiring)	return;
 	bFiring = true;
+	
+	if (bAutoFire)
+	{
+		//UKismetSystemLibrary::K2_SetTimer(this, "Firing", 0.085f, true);//ufunction만 바인딩이 된다
+		GetWorld()->GetTimerManager().SetTimer(AutoFireHandle, this, &ACPP_Rifle::Firing, 0.085f, true, 0);
+		return;
+	}
 	Firing();
 }
 
 void ACPP_Rifle::End_Fire()
 {
 	bFiring = false;
+	if (bAutoFire)
+		GetWorld()->GetTimerManager().ClearTimer(AutoFireHandle);
+		//UKismetSystemLibrary::K2_ClearTimer(this, "Firing");
+}
+
+void ACPP_Rifle::ToggleAutoFire()
+{
+	if (!bFiring)
+		bAutoFire = !bAutoFire;
 }
 
 bool ACPP_Rifle::IsAvailableAim()

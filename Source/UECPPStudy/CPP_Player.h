@@ -51,6 +51,8 @@ private:
 	void OnFire();
 	void OffFire();
 
+	void OnAutoFire();
+
 	// IIRifle을(를) 통해 상속됨
 	virtual void Begin_Equip_Rifle() override;
 	virtual void End_Equip_Rifle() override;

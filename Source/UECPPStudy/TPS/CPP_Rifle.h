@@ -38,7 +38,8 @@ private:
 		class UParticleSystem* ImpactParticle;
 	UPROPERTY(EditDefaultsOnly, Category = "Fire")
 		class UMaterialInstanceConstant* ImpactDecal;
-
+	UPROPERTY(EditDefaultsOnly, Category = "Fire")
+		float LimitPitchAngle;
 private:
 	UPROPERTY(VisibleDefaultsOnly)
 		class USkeletalMeshComponent* Mesh;
@@ -73,6 +74,9 @@ public:
 
 	void Begin_Fire();
 	void End_Fire();
+
+	void ToggleAutoFire();
+
 private:
 	bool IsAvailableAim();
 
@@ -86,7 +90,13 @@ private:
 	bool bEquipping;
 	bool bAiming;
 	bool bFiring;
+	bool bAutoFire;
 
 	FTimeline Timeline;
 	FOnTimelineFloat OnTimelineFloat;
+
+	float PitchAngle;
+
+	FTimerHandle AutoFireHandle;
+	FTimerHandle 
 };

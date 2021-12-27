@@ -21,12 +21,13 @@ void UCPP_AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		return;
 	Speed = OwnerCharacter->GetVelocity().Size2D();
 	Direction = CalculateDirection(OwnerCharacter->GetVelocity(), OwnerCharacter->GetControlRotation());
+	
 	IIRifle* rifle = Cast<IIRifle>(OwnerCharacter);
-
 	if (rifle != nullptr)
 	{
 		bEquipped = rifle->Get_Equip_Rifle();
 		bAiming = rifle->Get_Aim_Rifle();
 	}
-
+	//controller와 카메라의 위치가 다르기때문에 카메라의 각도로 하는게 더 정확하다
+	Pitch = OwnerCharacter->GetBaseAimRotation().Pitch;
 }
