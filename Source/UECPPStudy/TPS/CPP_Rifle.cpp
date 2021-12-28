@@ -52,12 +52,16 @@ void ACPP_Rifle::BeginPlay()
 	OnTimelineFloat.BindUFunction(this,"Aiming");//함수를 바인딩해서 값을 전달한다.
 	Timeline.AddInterpFloat(Curve, OnTimelineFloat);
 	Timeline.SetPlayRate(200);
+
+	Delay = 0;
 }
 
 void ACPP_Rifle::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	Timeline.TickTimeline(DeltaTime);
+
+	Delay -= DeltaTime;
 }
 
 ACPP_Rifle* ACPP_Rifle::Spawn(UWorld* InWorld, ACharacter* InOwnerCharacter)
@@ -129,7 +133,15 @@ void ACPP_Rifle::Firing()
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticle, hitResult.Location, rotator);
 		//피격 지점 표시
 		UDecalComponent* decal = UGameplayStatics::SpawnDecalAtLocation(GetWorld(), ImpactDecal, FVector(5), hitResult.Location, rotator, 10);
-		decal->SetFadeScreenSize(0);//
+		decal->SetFadeScreenSize(0);
+		//충돌 처리하기 위해서 충돌 객체의 매쉬를 가져옴
+		UStaticMeshComponent* mesh = Cast<UStaticMeshComponent>(hitResult.GetActor()->GetRootComponent());
+		if (mesh && mesh->BodyInstance.bSimulatePhysics)//mesh가 존재하는지와 물리가 켜져있는지 확인
+		{
+			direction = hitResult.GetActor()->GetActorLocation() - OwnerCharacter->GetActorLocation();//방향
+			direction.Normalize();//정규화
+			mesh->AddImpulseAtLocation(direction * 300, OwnerCharacter->GetActorLocation());//해당 위치에 물리효과 줌
+		}
 	}
 
 }
@@ -222,6 +234,11 @@ void ACPP_Rifle::Begin_Fire()
 	if (bEquipping) return;
 	if (!bAiming)	return;
 	if (bFiring)	return;
+	if (Delay > 0)
+	{
+		CLog::Log("Over rate");
+		return;
+	}
 	bFiring = true;
 	
 	if (bAutoFire)
@@ -230,6 +247,7 @@ void ACPP_Rifle::Begin_Fire()
 		GetWorld()->GetTimerManager().SetTimer(AutoFireHandle, this, &ACPP_Rifle::Firing, 0.085f, true, 0);
 		return;
 	}
+	Delay = 0.085f;
 	Firing();
 }
 

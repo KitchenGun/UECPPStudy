@@ -9,4 +9,8 @@ AUECPPStudyGameModeBase::AUECPPStudyGameModeBase()
 	{
 		DefaultPawnClass = player.Class;
 	}
+	
+	//ConstructorHelpers::FClassFinder<AHUD> HUDclass(L"Blueprint'/Game/BP/BP_HUD.BP_HUD_C'");//class는_C붙여야함
+
+
 }

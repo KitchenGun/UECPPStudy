@@ -96,7 +96,7 @@ private:
 	FOnTimelineFloat OnTimelineFloat;
 
 	float PitchAngle;
+	float Delay;
 
 	FTimerHandle AutoFireHandle;
-	FTimerHandle 
 };
