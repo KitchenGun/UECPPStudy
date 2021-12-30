@@ -22,5 +22,15 @@ public:
 	ACPP_HUD();
 
 	virtual void DrawHUD() override;
+private:
+	bool bDraw;
+	FLinearColor Color = FLinearColor::White;
+public:
+	FORCEINLINE void Visible() { bDraw = true; }
+	FORCEINLINE void InVisible() { bDraw = false; }
+
+	FORCEINLINE void EnableTarget() { Color = FLinearColor::Red; }
+	FORCEINLINE void DisableTarget() { Color = FLinearColor::White; }
+
 
 };

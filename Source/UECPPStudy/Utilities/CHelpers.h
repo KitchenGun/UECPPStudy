@@ -86,4 +86,10 @@ public:
 		return color;
 	}
 
+	static FString GetStringFromEnum(FString InTypeName, int32 InIndex)
+	{
+		//enum 인덱스에 맞는 string 반환
+		UEnum* ptr = FindObject<UEnum>(ANY_PACKAGE, *InTypeName, true);
+		return ptr->GetNameStringByIndex(InIndex);
+	}
 };

@@ -1,7 +1,7 @@
 #include "TPS/CPP_Rifle.h"
 #include "CPP_Bullet.h"
+#include "CPP_HUD.h"
 #include "Global.h"
-
 
 #include "GameFramework/Character.h"
 #include "GameFramework/PlayerController.h"
@@ -29,8 +29,8 @@ ACPP_Rifle::ACPP_Rifle()
 	CHelpers::GetAsset<USkeletalMesh>(&mesh, "SkeletalMesh'/Game/Weapons/Meshes/SK_AR4.SK_AR4'");
 	Mesh->SetSkeletalMesh(mesh);
 
-	CHelpers::GetAsset<UAnimMontage>(&GrabMontage, "AnimMontage'/Game/Character/Animations/Montage/Rifle_Grab_Montage.Rifle_Grab_Montage'");
-	CHelpers::GetAsset<UAnimMontage>(&UnGrabMontage, "AnimMontage'/Game/Character/Animations/Montage/Rifle_UnGrab_Montage.Rifle_UnGrab_Montage'");
+	CHelpers::GetAsset<UAnimMontage>(&GrabMontage, "AnimMontage'/Game/Character/Montages/Rifle_Grab_Montage.Rifle_Grab_Montage'");
+	CHelpers::GetAsset<UAnimMontage>(&UnGrabMontage, "AnimMontage'/Game/Character/Montages/Rifle_UnGrab_Montage.Rifle_UnGrab_Montage'");
 	CHelpers::GetAsset<UCurveFloat>(&Curve, "CurveFloat'/Game/FStructs/Curve_Aim.Curve_Aim'");
 	CHelpers::GetClass<UMatineeCameraShake>(&CameraShakeClass, "Blueprint'/Game/BP/TPS/BP_CameraShake.BP_CameraShake_C'");
 	CHelpers::GetAsset<USoundCue>(&MuzzleSoundCue, "SoundCue'/Game/Sounds/S_RifleShoot_Cue.S_RifleShoot_Cue'");
@@ -62,6 +62,37 @@ void ACPP_Rifle::Tick(float DeltaTime)
 	Timeline.TickTimeline(DeltaTime);
 
 	Delay -= DeltaTime;
+
+	if(bAiming)//Hud 적 조준시 색상 변경
+	{
+		//카메라 컴포넌트접근
+		UCameraComponent* camera = CHelpers::GetComponent<UCameraComponent>(OwnerCharacter);
+		FTransform transform = camera->GetComponentToWorld();
+		FVector direction = camera->GetForwardVector();
+		FVector start = transform.GetLocation() + direction;
+		FVector end = transform.GetLocation() + direction * AimDistance;
+
+		ACPP_HUD* hub = OwnerCharacter->GetController<APlayerController>()->GetHUD<ACPP_HUD>();
+
+		//linetrace
+		TArray<AActor*> ignoreActors;//자기 자신충돌 제외하기 위해서
+		ignoreActors.Add(OwnerCharacter);
+
+		FHitResult hitResult;
+
+		UKismetSystemLibrary::LineTraceSingle(GetWorld(), start, end, ETraceTypeQuery::TraceTypeQuery3, false, ignoreActors, EDrawDebugTrace::None, hitResult, true);
+		UStaticMeshComponent* mesh = Cast<UStaticMeshComponent>(hitResult.GetActor()->GetRootComponent());
+
+		if (hitResult.bBlockingHit)
+		{
+			hub->EnableTarget();
+		}
+		else
+		{
+			hub->DisableTarget();
+		}
+	}
+
 }
 
 ACPP_Rifle* ACPP_Rifle::Spawn(UWorld* InWorld, ACharacter* InOwnerCharacter)
@@ -211,6 +242,8 @@ void ACPP_Rifle::Begin_Aim()
 	springArm->TargetArmLength = 100;
 	springArm->SocketOffset = FVector(0, 30, 10);
 	Timeline.PlayFromStart();
+	//aim 표시 키기
+	OwnerCharacter->GetController<APlayerController>()->GetHUD<ACPP_HUD>()->Visible();
 }
 
 void ACPP_Rifle::End_Aim()
@@ -226,6 +259,8 @@ void ACPP_Rifle::End_Aim()
 	springArm->TargetArmLength = 200;
 	springArm->SocketOffset = FVector(0, 60, 0);
 	Timeline.ReverseFromEnd();
+	//aim 표시 끄기
+	OwnerCharacter->GetController<APlayerController>()->GetHUD<ACPP_HUD>()->InVisible();
 }
 
 void ACPP_Rifle::Begin_Fire()

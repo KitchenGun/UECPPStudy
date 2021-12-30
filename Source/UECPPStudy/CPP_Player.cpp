@@ -9,12 +9,15 @@
 #include "Camera/CameraComponent.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "TPS/CPP_Rifle.h"
+#include "TPS/CPP_UserWidget.h"
+#include "Parkour/CPP_ParkourComponent.h"
 
 ACPP_Player::ACPP_Player()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	CHelpers::CreateComponent<USpringArmComponent>(this, &SpringArm, "SpringArm", GetCapsuleComponent());
 	CHelpers::CreateComponent<UCameraComponent>(this, &Camera, "Camera", SpringArm);
+	CHelpers::CreateActorComponent<UCPP_ParkourComponent>(this, &Parkour, "Parkour");
 
 	bUseControllerRotationYaw = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
@@ -34,12 +37,17 @@ ACPP_Player::ACPP_Player()
 	SpringArm->bUsePawnControlRotation = true;
 	SpringArm->SocketOffset = FVector(0, 60, 0);
 	
+
+	CHelpers::GetClass<UCPP_UserWidget>(&AutoFireClass, "WidgetBlueprint'/Game/BP/TPS/BP_AutoFire.BP_AutoFire_C'");
 }
 
 void ACPP_Player::BeginPlay()
 {
 	Super::BeginPlay();
 	Rifle = ACPP_Rifle::Spawn(GetWorld(), this);
+	AutoFire = CreateWidget<UCPP_UserWidget, APlayerController>(GetController<APlayerController>(), AutoFireClass);
+	AutoFire->AddToViewport();
+
 }
 
 void ACPP_Player::Tick(float DeltaTime)
@@ -141,6 +149,7 @@ void ACPP_Player::OffFire()
 void ACPP_Player::OnAutoFire()
 {
 	Rifle->ToggleAutoFire();
+	Rifle->GetAutoFire()? AutoFire->On(): AutoFire->Off();
 }
 
 void ACPP_Player::Begin_Equip_Rifle()

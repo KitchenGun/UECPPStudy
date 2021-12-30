@@ -40,18 +40,24 @@ class UECPPSTUDY_API ACPP_Player : public ACharacter,public IIRifle
 	//언리얼 에서는 어떤 클래스든지 구조체든지 생성자와 소멸자가 필요하다 그것을 대신 만들어 주는 것이 GENERATED_BODY
 	GENERATED_BODY()
 private:
+	UPROPERTY(EditDefaultsOnly, Category = "UserInterface");
+		TSubclassOf<class UCPP_UserWidget> AutoFireClass;
 	UPROPERTY(VisibleDefaultsOnly)
 		class USpringArmComponent* SpringArm;
 	UPROPERTY(VisibleDefaultsOnly)
 		class UCameraComponent* Camera;
-
-	class ACPP_Rifle* Rifle;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Zoom")
 		float ZoomSpeed = 1000;
 	UPROPERTY(EditDefaultsOnly, Category = "Zoom")
 		FVector2D ZoomRange = FVector2D(0, 500);
 
+	UPROPERTY(VisibleDefaultsOnly)
+		class UCPP_ParkourComponent* Parkour;
+
+private:
+	class ACPP_Rifle* Rifle;
+	class UCPP_UserWidget* AutoFire;
 public:
 	ACPP_Player();
 
