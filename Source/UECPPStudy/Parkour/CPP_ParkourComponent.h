@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Engine/DataTable.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "CPP_ParkourComponent.generated.h"
 
 //enum//언리얼은 꼭 uint8형식이여야한다
@@ -35,6 +36,7 @@ USTRUCT(BlueprintType)
 struct FParkourData : public FTableRowBase
 {
 	GENERATED_BODY()
+
 public:
 	UPROPERTY(EditAnywhere)
 		EParkourType Type;
@@ -56,11 +58,13 @@ UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )//클래스의 그룹
 class UECPPSTUDY_API UCPP_ParkourComponent : public UActorComponent
 {
 	GENERATED_BODY()
-
 private:
 	UPROPERTY(EditAnywhere, Category = "DataTable")//변경할일이 많기때문에 EditAnywhere로 설정한다
 		class UDataTable* DataTable;
-
+	UPROPERTY(EditAnywhere, Category = "Trace")
+		float TraceDistance = 600;
+	UPROPERTY(EditAnywhere, Category = "Trace")
+		TEnumAsByte<EDrawDebugTrace::Type> DrawDebugType;
 public:	
 	UCPP_ParkourComponent();
 
@@ -69,7 +73,29 @@ protected:
 
 public:	
 	//Tick이 다르다 틱의 유형을 선택가능하다. 
+
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
 private:
+	void LineTrace(EParkourArrowType InType);
+
+	void CheckTarce_Center();
+	void CheckTarce_Ceil();
+	void CheckTarce_Floor();
+	void CheckTarce_LeftAndRight();
+	void CheckTarce_Land();
+
+
+private:
+	class ACharacter* OwnerCharacter;
+	
 	TMap<EParkourType, TArray<FParkourData>> DataMap;
+
+	class UArrowComponent* Arrows[(int32)EParkourArrowType::Max];
+
+	FHitResult HitResults[(int32)EParkourArrowType::Max];
+
+	AActor* HitObstacle;//맞은 장애물
+	FVector HitObstacleExtent;//장애물 범위?
+	float HitDistance;//맞은 거리
 };

@@ -55,6 +55,21 @@ public:
 	}
 
 	template<typename T>
+	static T* GetComponent(AActor* InActor,FString InComponentName)
+	{
+		TArray<T*> components;
+		InActor->GetComponents<T>(components);
+
+		for (T* component : components)
+		{
+			if (component->GetName() == InComponentName)
+				return component;
+		}
+
+		return nullptr;
+	}
+
+	template<typename T>
 	static T* FindActor(UWorld* InWorld, int32 InIndex = 0)
 	{
 		TArray<AActor*> actors;

@@ -39,6 +39,43 @@ ACPP_Player::ACPP_Player()
 	
 
 	CHelpers::GetClass<UCPP_UserWidget>(&AutoFireClass, "WidgetBlueprint'/Game/BP/TPS/BP_AutoFire.BP_AutoFire_C'");
+
+	CHelpers::CreateComponent<USceneComponent>(this, &ArrowGroup, "ArrowGroup", GetCapsuleComponent());
+	for (int32 i = 0; i < (int32)EParkourArrowType::Max; i++)
+	{
+		FName name = FName(*CHelpers::GetStringFromEnum("EParkourArrowType", i));
+		CHelpers::CreateComponent<UArrowComponent>(this, &Arrows[i], name, ArrowGroup);
+
+		switch ((EParkourArrowType)i)
+		{
+		case EParkourArrowType::Center:
+			Arrows[i]->ArrowColor = FColor::Red;
+			break;
+		case EParkourArrowType::Ceil:
+			Arrows[i]->ArrowColor = FColor::Green;
+			Arrows[i]->SetRelativeLocation(FVector(0, 0, 100));
+			break;
+		case EParkourArrowType::Floor:
+			Arrows[i]->ArrowColor = FColor::Green;
+			Arrows[i]->SetRelativeLocation(FVector(0, 0, -80));
+			break;
+		case EParkourArrowType::Left:
+			Arrows[i]->ArrowColor = FColor::Magenta;
+			Arrows[i]->SetRelativeLocation(FVector(0, -30, 0));
+			break;
+		case EParkourArrowType::Right:
+			Arrows[i]->ArrowColor = FColor::Magenta;
+			Arrows[i]->SetRelativeLocation(FVector(0, 30, 0));
+			break;
+		case EParkourArrowType::Land:
+			Arrows[i]->ArrowColor = FColor::Yellow;
+			Arrows[i]->SetRelativeLocation(FVector(200, 0, 100));
+			Arrows[i]->SetRelativeLocation(FVector(-90, 0, 0));
+			break;
+		default:
+			break;
+		}
+	}
 }
 
 void ACPP_Player::BeginPlay()

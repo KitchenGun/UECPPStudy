@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "TPS/IRifle.h"
+#include "Parkour/CPP_ParkourComponent.h"
 #include "CPP_Player.generated.h"//코드->reflection데이터에 추가하고 generated.h를 에디터에서 비추기 위해 사용합니다 
 
 //reflection system
@@ -55,6 +56,11 @@ private:
 	UPROPERTY(VisibleDefaultsOnly)
 		class UCPP_ParkourComponent* Parkour;
 
+	UPROPERTY(VisibleDefaultsOnly)
+		class USceneComponent* ArrowGroup;
+
+	UPROPERTY(VisibleDefaultsOnly)
+		class UArrowComponent* Arrows[(int32)EParkourArrowType::Max];
 private:
 	class ACPP_Rifle* Rifle;
 	class UCPP_UserWidget* AutoFire;
