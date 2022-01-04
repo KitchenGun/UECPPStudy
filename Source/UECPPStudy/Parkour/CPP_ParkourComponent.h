@@ -96,6 +96,6 @@ private:
 	FHitResult HitResults[(int32)EParkourArrowType::Max];
 
 	AActor* HitObstacle;//맞은 장애물
-	FVector HitObstacleExtent;//장애물 범위?
+	FVector HitObstacleExtent;//장애물 두께
 	float HitDistance;//맞은 거리
 };

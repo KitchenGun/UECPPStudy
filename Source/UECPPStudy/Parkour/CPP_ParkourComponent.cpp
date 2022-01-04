@@ -58,7 +58,14 @@ void UCPP_ParkourComponent::BeginPlay()
 void UCPP_ParkourComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
+	CheckTarce_Center();
+	if (HitObstacle)
+	{
+		CheckTarce_Ceil();
+		CheckTarce_Floor();
+		CheckTarce_LeftAndRight();
+	}
+	CheckTarce_Land();
 }
 
 void UCPP_ParkourComponent::LineTrace(EParkourArrowType InType)
@@ -80,23 +87,55 @@ void UCPP_ParkourComponent::LineTrace(EParkourArrowType InType)
 
 }
 
-void UCPP_ParkourComponent::CheckTarce_Center()
+void UCPP_ParkourComponent::CheckTarce_Center()//센터로 레이를 쏴서 확인
 {
+	//파쿠르 확인 관련 변수 초기화
+	HitObstacle = nullptr;
+	HitObstacleExtent = FVector::ZeroVector;
+	HitDistance = 0.0f;
+	EParkourArrowType type = EParkourArrowType::Center;
+	//센터로 레이 쏨
+	LineTrace(type);
+	const FHitResult& hitResult = HitResults[(int32)type];
+	//반환된 결과를 기반으로 파쿠르 확인 변수 변경
+	if (hitResult.bBlockingHit)
+	{
+		UStaticMeshComponent* mesh = CHelpers::GetComponent<UStaticMeshComponent>(hitResult.GetActor());
+	
+		if (mesh)
+		{
+			HitObstacle = hitResult.GetActor();
+			//mesh의 두께를 구함
+			FVector minBound, maxBound;
+			mesh->GetLocalBounds(minBound,maxBound);//최소 좌표와 최대 좌표를 가져옴
+			float x = FMath::Abs(minBound.X - maxBound.X);//절댓값
+			float y = FMath::Abs(minBound.Y - maxBound.Y);
+			float z = FMath::Abs(minBound.Z - maxBound.Z);
+			HitObstacleExtent = FVector(x,y,z);//거리를 저장
+			
+			HitDistance = hitResult.Distance;
+		}
+	}
 }
 
-void UCPP_ParkourComponent::CheckTarce_Ceil()
+void UCPP_ParkourComponent::CheckTarce_Ceil()//머리 위에 부분
 {
+	LineTrace(EParkourArrowType::Ceil);
 }
 
 void UCPP_ParkourComponent::CheckTarce_Floor()
 {
+	LineTrace(EParkourArrowType::Floor);
 }
 
 void UCPP_ParkourComponent::CheckTarce_LeftAndRight()
 {
+	LineTrace(EParkourArrowType::Left);
+	LineTrace(EParkourArrowType::Right);
 }
 
 void UCPP_ParkourComponent::CheckTarce_Land()
 {
+	LineTrace(EParkourArrowType::Land);
 }
 
