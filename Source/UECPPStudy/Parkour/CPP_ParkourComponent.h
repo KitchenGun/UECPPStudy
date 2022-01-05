@@ -85,6 +85,12 @@ private:
 	void CheckTarce_LeftAndRight();
 	void CheckTarce_Land();
 
+	void DoParkour();
+	bool Check_Obstacle();
+	bool Check_ClimbMode();
+	bool Check_SlideMode();
+
+	void DoParkour_Obstacle(EParkourType InType, const FParkourData* OutData);
 
 private:
 	class ACharacter* OwnerCharacter;
@@ -98,4 +104,5 @@ private:
 	AActor* HitObstacle;//맞은 장애물
 	FVector HitObstacleExtent;//장애물 두께
 	float HitDistance;//맞은 거리
+	EParkourType Type = EParkourType::Max;
 };
