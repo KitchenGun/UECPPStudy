@@ -84,13 +84,23 @@ private:
 	void CheckTarce_Floor();
 	void CheckTarce_LeftAndRight();
 	void CheckTarce_Land();
-
-	void DoParkour();
+private:
 	bool Check_Obstacle();
 	bool Check_ClimbMode();
-	bool Check_SlideMode();
+	void DoParkour_Climb();
+	void EndParkour_Climb();
 
-	void DoParkour_Obstacle(EParkourType InType, const FParkourData* OutData);
+	bool Check_SlideMode();
+	void DoParkour_Slide();
+	void EndParkour_Slide();
+	
+	bool Check_ObstacleMode(EParkourType InType, FParkourData& OutData);
+	
+	void DoParkour_Obstacle(EParkourType InType, const FParkourData& OutData);
+	void EndParkour_Obstacle();
+public:
+	void DoParkour();
+	void EndDoParkour();
 
 private:
 	class ACharacter* OwnerCharacter;

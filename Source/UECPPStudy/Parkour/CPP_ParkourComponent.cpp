@@ -1,6 +1,7 @@
 #include "Parkour/CPP_ParkourComponent.h"
 #include "GameFramework/Character.h"
 #include "Components/ArrowComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Global.h"
 
 #define Log_UParkourComponent
@@ -32,6 +33,7 @@ void UCPP_ParkourComponent::BeginPlay()
 
 		DataMap.Add((EParkourType)i, temp);
 	}
+
 #ifdef Log_UParkourComponent
 	for (TPair<EParkourType, TArray<FParkourData>> map : DataMap)
 	{
@@ -138,26 +140,6 @@ void UCPP_ParkourComponent::CheckTarce_Land()
 	LineTrace(EParkourArrowType::Land);
 }
 
-void UCPP_ParkourComponent::DoParkour()
-{
-	if (!Check_Obstacle()) return;
-	if (Check_ClimbMode())
-	{
-		return;
-	}
-	if (Check_SlideMode())
-	{
-		return;
-	}
-	
-	if (HitResults[(int32)EParkourArrowType::Ceil].bBlockingHit)return;//너무 높은 벽인 경우
-	
-	FVector normal = HitResults[(int32)EParkourArrowType::Center].Normal;//충돌 엑터의 정규화 방향
-	FVector forward = HitObstacle->GetActorForwardVector();//
-
-	float dot = normal | forward;
-	if (!FMath::IsNearlyZero(dot, 0.1f)) return;
-}
 
 bool UCPP_ParkourComponent::Check_Obstacle()
 {
@@ -199,6 +181,21 @@ bool UCPP_ParkourComponent::Check_ClimbMode()
 	return true;
 }
 
+void UCPP_ParkourComponent::DoParkour_Climb()
+{
+	Type = EParkourType::Climb;
+
+	OwnerCharacter->SetActorLocation(HitResults[(int32)EParkourArrowType::Center].ImpactPoint);
+	const TArray<FParkourData>* data = DataMap.Find(EParkourType::Climb);
+	OwnerCharacter->PlayAnimMontage((*data)[0].Montage, (*data)[0].PlayRatio, (*data)[0].SectionName);
+	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
+}
+
+void UCPP_ParkourComponent::EndParkour_Climb()
+{
+	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+}
+
 bool UCPP_ParkourComponent::Check_SlideMode()
 {
 	if (!HitResults[(int32)EParkourArrowType::Ceil].bBlockingHit)return false;
@@ -237,9 +234,110 @@ bool UCPP_ParkourComponent::Check_SlideMode()
 	return true;
 }
 
-void UCPP_ParkourComponent::DoParkour_Obstacle(EParkourType InType, const FParkourData* OutData)
+void UCPP_ParkourComponent::DoParkour_Slide()
 {
-	Type = InType;
-	OwnerCharacter->PlayAnimMontage(OutData->Montage, OutData->PlayRatio, OutData->SectionName);
 }
 
+void UCPP_ParkourComponent::EndParkour_Slide()
+{
+}
+
+bool UCPP_ParkourComponent::Check_ObstacleMode(EParkourType InType, FParkourData &OutData)
+{
+	const TArray<FParkourData>* datas = DataMap.Find(InType);
+	for (int32 i = 0; i < (*datas).Num(); i++)
+	{
+		bool bExcute = true;
+		bExcute &= (*datas)[i].MinDistance < HitDistance;
+		bExcute &= (*datas)[i].MaxDistance > HitDistance;
+		bExcute &= FMath::IsNearlyEqual((*datas)[i].Extent,HitObstacleExtent.Y,10);
+		
+		OutData = (*datas)[i];
+		if (bExcute) return true;
+	}
+	return false;
+}
+
+void UCPP_ParkourComponent::DoParkour_Obstacle(EParkourType InType, const FParkourData& OutData)
+{
+	Type = InType;
+	OwnerCharacter->PlayAnimMontage(OutData.Montage, OutData.PlayRatio, OutData.SectionName);
+}
+
+void UCPP_ParkourComponent::EndParkour_Obstacle()
+{
+}
+
+
+void UCPP_ParkourComponent::DoParkour()
+{
+	if (Type != EParkourType::Max)	return;
+	if (Check_Obstacle()) return;
+	if (Check_ClimbMode())
+	{
+		DoParkour_Climb();
+		return;
+	}
+	if (Check_SlideMode())
+	{
+		DoParkour_Slide();
+		return;
+	}
+	
+	if (HitResults[(int32)EParkourArrowType::Ceil].bBlockingHit)return;//너무 높은 벽인 경우
+	
+																	   
+	/* 방향을 검사하는 부분 현재 필요없음
+	FVector normal = HitResults[(int32)EParkourArrowType::Center].Normal;//충돌 엑터의 정규화 방향
+	FVector forward = HitObstacle->GetActorForwardVector();//
+	
+	float dot = normal | forward;
+	
+	if (!FMath::IsNearlyZero(dot, 0.1f)) return;
+	*/
+
+
+	FParkourData data;
+
+	if (Check_ObstacleMode(EParkourType::Normal, data))
+	{
+		DoParkour_Obstacle(EParkourType::Normal, data);
+		return;
+	}
+	if (Check_ObstacleMode(EParkourType::Short, data))
+	{
+		DoParkour_Obstacle(EParkourType::Short, data);
+		return;
+	}
+	if (Check_ObstacleMode(EParkourType::Wall, data))
+	{
+		DoParkour_Obstacle(EParkourType::Wall, data);
+		return;
+	}
+}
+
+void UCPP_ParkourComponent::EndDoParkour()
+{
+	switch (Type)
+	{
+	case EParkourType::Climb:
+		EndParkour_Climb();
+		break;
+	case EParkourType::Fall:
+		break;
+	case EParkourType::Slide:
+		EndParkour_Slide();
+		break;
+	case EParkourType::Short:
+		EndParkour_Obstacle();
+		break;
+	case EParkourType::Normal:
+		EndParkour_Obstacle();
+		break;
+	case EParkourType::Wall:
+		EndParkour_Obstacle();
+		break;
+	}
+
+	Type = EParkourType::Max;
+}

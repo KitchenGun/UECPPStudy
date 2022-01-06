@@ -114,6 +114,8 @@ void ACPP_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction("Fire", EInputEvent::IE_Released, this, &ACPP_Player::OffFire);
 
 	PlayerInputComponent->BindAction("AutoFire", EInputEvent::IE_Pressed, this, &ACPP_Player::OnAutoFire);
+
+	PlayerInputComponent->BindAction("Parkour", EInputEvent::IE_Pressed, this, &ACPP_Player::OnParkour);
 }
 
 void ACPP_Player::OnMoveForward(float AxisValue)
@@ -187,6 +189,11 @@ void ACPP_Player::OnAutoFire()
 {
 	Rifle->ToggleAutoFire();
 	Rifle->GetAutoFire()? AutoFire->On(): AutoFire->Off();
+}
+
+void ACPP_Player::OnParkour()
+{
+	Parkour->DoParkour();
 }
 
 void ACPP_Player::Begin_Equip_Rifle()
