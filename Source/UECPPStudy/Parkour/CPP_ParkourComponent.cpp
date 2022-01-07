@@ -137,7 +137,28 @@ void UCPP_ParkourComponent::CheckTarce_LeftAndRight()
 
 void UCPP_ParkourComponent::CheckTarce_Land()
 {
-	LineTrace(EParkourArrowType::Land);
+	if (OwnerCharacter->GetCharacterMovement()->IsFalling()) 
+		return;
+	if (bStartFall) 
+		return;
+
+	bStartFall = true;
+	
+	UArrowComponent* arrow = Arrows[(int32)EParkourArrowType::Land];
+	FLinearColor color = FLinearColor(arrow->ArrowColor);
+
+	FTransform transform = arrow->GetComponentToWorld();
+	FVector start = transform.GetLocation();
+
+	const TArray<FParkourData>* datas = DataMap.Find(EParkourType::Fall);
+	FVector end = start + transform.GetRotation().GetForwardVector() * (*datas)[0].Extent;
+	//충돌 무시
+	TArray<AActor*> ignoreActors;//자기 자신충돌 제외하기 위해서
+	ignoreActors.Add(OwnerCharacter);
+
+	UKismetSystemLibrary::LineTraceSingle(GetWorld(), start, end, ETraceTypeQuery::TraceTypeQuery1, false,
+		ignoreActors, DrawDebugType, HitResults[(int32)EParkourArrowType::Land], true, color, FLinearColor::White, 0);
+
 }
 
 
@@ -161,22 +182,28 @@ bool UCPP_ParkourComponent::Check_Obstacle()
 		//Location		월드스페이스의 맞은 지점을 반환
 		//Normal		라인트레이스의 경우 ImpactNormal와 동일
 	//전부 충돌방향이 같은지 확인
-	if (center.Equals(left))	return false;
-	if (center.Equals(right))	return false;
+	if (!center.Equals(left))	
+		return false;
+	if (!center.Equals(right))	
+		return false;
 	//전부 충돌할경우
 	return true;
 }
 
 bool UCPP_ParkourComponent::Check_ClimbMode()
 {
-	if (!HitResults[(int32)EParkourArrowType::Ceil].bBlockingHit)return false;
+	if (!HitResults[(int32)EParkourArrowType::Ceil].bBlockingHit) return false;
 
 	const TArray<FParkourData>* data = DataMap.Find(EParkourType::Climb);
 	//범위에서 벗어나면 false로 반환한다 
-	if ((*data)[0].MinDistance < HitDistance) return false;//최소 거리
-	if ((*data)[0].MaxDistance > HitDistance) return false;//최대 거리
+	if ((*data)[0].MinDistance > HitDistance) 
+		return false;//최소 거리
+
+	if ((*data)[0].MaxDistance < HitDistance) 
+		return false;//최대 거리
 	//높이가 다를경우 false로 반환한다
-	if (FMath::IsNearlyEqual((*data)[0].Extent, HitObstacleExtent.Z)) return false;
+	if (!FMath::IsNearlyEqual((*data)[0].Extent, HitObstacleExtent.Z,10)) 
+		return false;
 
 	return true;
 }
@@ -198,12 +225,14 @@ void UCPP_ParkourComponent::EndParkour_Climb()
 
 bool UCPP_ParkourComponent::Check_SlideMode()
 {
-	if (!HitResults[(int32)EParkourArrowType::Ceil].bBlockingHit)return false;
+	if (HitResults[(int32)EParkourArrowType::Floor].bBlockingHit)return false;
 
 	const TArray<FParkourData>* data = DataMap.Find(EParkourType::Slide);
 	//범위에서 벗어나면 false로 반환한다 
-	if ((*data)[0].MinDistance < HitDistance) return false;//최소 거리
-	if ((*data)[0].MaxDistance > HitDistance) return false;//최대 거리
+	if ((*data)[0].MinDistance > HitDistance) 
+		return false;//최소 거리
+	if ((*data)[0].MaxDistance < HitDistance) 
+		return false;//최대 거리
 	//속력가 일정이상인지?
 	//높이가 일정이상인지?
 	UArrowComponent* arrow = Arrows[(int32)EParkourArrowType::Floor];
@@ -236,10 +265,49 @@ bool UCPP_ParkourComponent::Check_SlideMode()
 
 void UCPP_ParkourComponent::DoParkour_Slide()
 {
+	Type = EParkourType::Slide;
+
+	const TArray<FParkourData>* data = DataMap.Find(Type);
+	OwnerCharacter->PlayAnimMontage((*data)[0].Montage, (*data)[0].PlayRatio, (*data)[0].SectionName);
+
+	BackupObstacle = HitObstacle;
+	BackupObstacle->SetActorEnableCollision(false);
 }
 
 void UCPP_ParkourComponent::EndParkour_Slide()
 {
+	BackupObstacle->SetActorEnableCollision(true);
+	BackupObstacle = nullptr;
+}
+
+bool UCPP_ParkourComponent::Check_FallMode()
+{
+	if (!bStartFall) 
+		return false;
+
+	bStartFall = false;
+	float distance = HitResults[(int32)EParkourArrowType::Land].Distance;
+
+	const TArray<FParkourData>* data = DataMap.Find(EParkourType::Fall);
+	if ((*data)[0].MinDistance > distance)
+		return false;
+	if ((*data)[0].MaxDistance < distance)
+		return false;
+
+	return true;
+}
+
+void UCPP_ParkourComponent::DoParkour_Fall()
+{
+	Type = EParkourType::Fall;
+	
+	const TArray<FParkourData>* data = DataMap.Find(EParkourType::Fall);
+	OwnerCharacter->PlayAnimMontage((*data)[0].Montage, (*data)[0].PlayRatio, (*data)[0].SectionName);
+}
+
+void UCPP_ParkourComponent::EndParkour_Fall()
+{
+	Type = EParkourType::Max;
 }
 
 bool UCPP_ParkourComponent::Check_ObstacleMode(EParkourType InType, FParkourData &OutData)
@@ -262,17 +330,26 @@ void UCPP_ParkourComponent::DoParkour_Obstacle(EParkourType InType, const FParko
 {
 	Type = InType;
 	OwnerCharacter->PlayAnimMontage(OutData.Montage, OutData.PlayRatio, OutData.SectionName);
+	BackupObstacle = HitObstacle;
+	BackupObstacle->SetActorEnableCollision(false);
 }
 
 void UCPP_ParkourComponent::EndParkour_Obstacle()
 {
+	BackupObstacle->SetActorEnableCollision(true);
+	BackupObstacle = nullptr;
 }
 
 
 void UCPP_ParkourComponent::DoParkour()
 {
-	if (Type != EParkourType::Max)	return;
-	if (Check_Obstacle()) return;
+	if (!(Type == EParkourType::Max)) return;
+	if (Check_FallMode())
+	{
+		DoParkour_Fall();
+		return;
+	}
+	if (!Check_Obstacle()) return;
 	if (Check_ClimbMode())
 	{
 		DoParkour_Climb();
@@ -283,6 +360,7 @@ void UCPP_ParkourComponent::DoParkour()
 		DoParkour_Slide();
 		return;
 	}
+	
 	
 	if (HitResults[(int32)EParkourArrowType::Ceil].bBlockingHit)return;//너무 높은 벽인 경우
 	
@@ -324,6 +402,7 @@ void UCPP_ParkourComponent::EndDoParkour()
 		EndParkour_Climb();
 		break;
 	case EParkourType::Fall:
+		EndParkour_Fall();
 		break;
 	case EParkourType::Slide:
 		EndParkour_Slide();

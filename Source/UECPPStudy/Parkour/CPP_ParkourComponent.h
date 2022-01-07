@@ -94,6 +94,10 @@ private:
 	void DoParkour_Slide();
 	void EndParkour_Slide();
 	
+	bool Check_FallMode();
+	void DoParkour_Fall();
+	void EndParkour_Fall();
+
 	bool Check_ObstacleMode(EParkourType InType, FParkourData& OutData);
 	
 	void DoParkour_Obstacle(EParkourType InType, const FParkourData& OutData);
@@ -115,4 +119,8 @@ private:
 	FVector HitObstacleExtent;//장애물 두께
 	float HitDistance;//맞은 거리
 	EParkourType Type = EParkourType::Max;
+
+	AActor* BackupObstacle;
+
+	bool bStartFall;
 };

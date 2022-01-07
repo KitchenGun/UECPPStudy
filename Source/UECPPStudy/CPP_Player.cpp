@@ -48,31 +48,29 @@ ACPP_Player::ACPP_Player()
 
 		switch ((EParkourArrowType)i)
 		{
-		case EParkourArrowType::Center://중심
+		case EParkourArrowType::Center:
 			Arrows[i]->ArrowColor = FColor::Red;
 			break;
-		case EParkourArrowType::Ceil://머리
+		case EParkourArrowType::Ceil:
 			Arrows[i]->ArrowColor = FColor::Green;
 			Arrows[i]->SetRelativeLocation(FVector(0, 0, 100));
 			break;
-		case EParkourArrowType::Floor://바닥
-			Arrows[i]->ArrowColor = FColor::Green;
+		case EParkourArrowType::Floor:
+			Arrows[i]->ArrowColor = FColor::Blue;
 			Arrows[i]->SetRelativeLocation(FVector(0, 0, -80));
 			break;
-		case EParkourArrowType::Left://왼쪽
+		case EParkourArrowType::Left:
 			Arrows[i]->ArrowColor = FColor::Magenta;
 			Arrows[i]->SetRelativeLocation(FVector(0, -30, 0));
 			break;
-		case EParkourArrowType::Right://오른쪽
+		case EParkourArrowType::Right:
 			Arrows[i]->ArrowColor = FColor::Magenta;
 			Arrows[i]->SetRelativeLocation(FVector(0, 30, 0));
 			break;
-		case EParkourArrowType::Land://? 어디에 사용하는지 모르겠음
+		case EParkourArrowType::Land:
 			Arrows[i]->ArrowColor = FColor::Yellow;
 			Arrows[i]->SetRelativeLocation(FVector(200, 0, 100));
 			Arrows[i]->SetRelativeRotation(FRotator(-90, 0, 0));
-			break;
-		default:
 			break;
 		}
 	}
