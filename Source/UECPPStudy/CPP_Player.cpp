@@ -11,6 +11,7 @@
 #include "TPS/CPP_Rifle.h"
 #include "TPS/CPP_UserWidget.h"
 #include "Parkour/CPP_ParkourComponent.h"
+#include "IK/CPP_IKFeetComponent.h"
 
 ACPP_Player::ACPP_Player()
 {
@@ -18,6 +19,7 @@ ACPP_Player::ACPP_Player()
 	CHelpers::CreateComponent<USpringArmComponent>(this, &SpringArm, "SpringArm", GetCapsuleComponent());
 	CHelpers::CreateComponent<UCameraComponent>(this, &Camera, "Camera", SpringArm);
 	CHelpers::CreateActorComponent<UCPP_ParkourComponent>(this, &Parkour, "Parkour");
+	CHelpers::CreateActorComponent<UCPP_IKFeetComponent>(this, &IKFeet, "IKFeet");
 
 	bUseControllerRotationYaw = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
@@ -114,6 +116,12 @@ void ACPP_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction("AutoFire", EInputEvent::IE_Pressed, this, &ACPP_Player::OnAutoFire);
 
 	PlayerInputComponent->BindAction("Parkour", EInputEvent::IE_Pressed, this, &ACPP_Player::OnParkour);
+}
+
+void ACPP_Player::Landed(const FHitResult& Hit)
+{//착지 할때 반환되는 함수
+	Super::Landed(Hit);
+	Parkour->DoParkour();
 }
 
 void ACPP_Player::OnMoveForward(float AxisValue)

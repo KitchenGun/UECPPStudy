@@ -137,7 +137,7 @@ void UCPP_ParkourComponent::CheckTarce_LeftAndRight()
 
 void UCPP_ParkourComponent::CheckTarce_Land()
 {
-	if (OwnerCharacter->GetCharacterMovement()->IsFalling()) 
+	if (!(OwnerCharacter->GetCharacterMovement()->IsFalling())) 
 		return;
 	if (bStartFall) 
 		return;

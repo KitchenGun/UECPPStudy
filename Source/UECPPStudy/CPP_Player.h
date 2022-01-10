@@ -55,7 +55,8 @@ private:
 
 	UPROPERTY(VisibleDefaultsOnly)
 		class UCPP_ParkourComponent* Parkour;
-
+	UPROPERTY(VisibleDefaultsOnly)
+		class UCPP_IKFeetComponent* IKFeet;
 	UPROPERTY(VisibleDefaultsOnly)
 		class USceneComponent* ArrowGroup;
 
@@ -74,6 +75,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void Landed(const FHitResult& Hit);
 private:
 	void OnMoveForward(float AxisValue);
 	void OnMoveRight(float AxisValue);
