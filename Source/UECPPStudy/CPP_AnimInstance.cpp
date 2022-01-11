@@ -30,4 +30,12 @@ void UCPP_AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	}
 	//controller와 카메라의 위치가 다르기때문에 카메라의 각도로 하는게 더 정확하다
 	Pitch = OwnerCharacter->GetBaseAimRotation().Pitch;
+
+	UCPP_IKFeetComponent* feet = CHelpers::GetComponent<UCPP_IKFeetComponent>(OwnerCharacter);
+
+	if (feet)
+	{
+		bFeet = true;
+		FeetData = feet->GetData();
+	}
 }

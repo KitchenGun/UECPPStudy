@@ -12,6 +12,9 @@ struct FFeetData
 
 public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Feet")
+		FVector PelvisDistance;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Feet")
 		FVector LeftDistance;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Feet")
@@ -22,6 +25,7 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Feet")
 		FRotator RightRotation;
+
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -58,7 +62,11 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 private:
 	void Trace(FName InName, float& OutDistance, FRotator& OutRoation);
-
+public:
+	FFeetData GetData() const
+	{
+		return Data;
+	}
 private:
 	class ACharacter* OwnerCharacter;
 
