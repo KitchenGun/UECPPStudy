@@ -28,6 +28,11 @@ public:
 
 };
 
+
+/*
+IK 역 운동학 Feet
+계층 구조를 변경하여서 (가상 본을 사용) 움직임을 변경하는것
+*/
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class UECPPSTUDY_API UCPP_IKFeetComponent : public UActorComponent
 {

@@ -27,19 +27,20 @@ void UCPP_IKFeetComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 	FRotator rightRotation;
 	Trace(LeftSocket, leftDistance, leftRotation);
 	Trace(RightSocket, rightDistance, rightRotation);
-
+	
 	float offset = FMath::Min(leftDistance, rightDistance);
 
 	Data.PelvisDistance.Z = UKismetMathLibrary::FInterpTo(Data.PelvisDistance.Z, offset, DeltaTime, InterpSpeed);
 	Data.LeftDistance.X = UKismetMathLibrary::FInterpTo(Data.LeftDistance.X, (leftDistance - offset), DeltaTime, InterpSpeed);
-	Data.RightDistance.X = UKismetMathLibrary::FInterpTo(Data.RightDistance.X, (rightDistance - offset), DeltaTime, InterpSpeed);
+	//앞발과 뒷발이 나가는 것을 + - 로 구별하기 위해서 이렇게함 본스페이스를 제어해야하기 때문에 이렇게 제작함
+	Data.RightDistance.X = UKismetMathLibrary::FInterpTo(Data.RightDistance.X, -(rightDistance - offset), DeltaTime, InterpSpeed);
 	Data.LeftRotation = UKismetMathLibrary::RInterpTo(Data.LeftRotation, leftRotation, DeltaTime, InterpSpeed);
 	Data.RightRotation = UKismetMathLibrary::RInterpTo(Data.RightRotation, rightRotation, DeltaTime, InterpSpeed);
 
 	CLog::Log("RightDistance");
-	CLog::Log(Data.RightDistance);
-	CLog::Log("LeftRotation");
-	CLog::Log(Data.LeftRotation);
+	CLog::Log(Data.RightDistance.X);
+	CLog::Log("LeftDistance");
+	CLog::Log(Data.LeftDistance.X);
 }
 
 void UCPP_IKFeetComponent::Trace(FName InName, float& OutDistance, FRotator& OutRotation)
